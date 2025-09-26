@@ -2,6 +2,7 @@ const express = require('express')
 require('dotenv').config()
 const colors = require('colors')
 const connectDB = require('./config/dbConfig')
+const errorHandler = require('./middleware/errorHandler')
 
 const PORT = process.env.PORT || 5000
 const app = express()
@@ -37,6 +38,10 @@ app.use("/api/event", require("./routes/eventRoutes"))
 
 // Admin Routes
 app.use("/api/admin", require("./routes/adminRoutes"))
+
+
+// Error Handler
+app.use(errorHandler)
 
 
 app.listen(PORT, () => {
