@@ -89,6 +89,17 @@ const loginUser = async (req, res) => {
 
 }
 
+
+const privateController = async (req, res) => {
+    console.log(req.user)
+    res.json({
+        msg: "I am Private Route On Loggedin Users Can Access Me"
+    })
+}
+
+
+
+
 // Generate Token
 const generateToken = (id) => {
     let token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '15d' })
@@ -97,4 +108,4 @@ const generateToken = (id) => {
 
 
 
-module.exports = { registerUser, loginUser }
+module.exports = { registerUser, loginUser, privateController }
