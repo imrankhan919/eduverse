@@ -1,16 +1,17 @@
 const express = require('express')
 const { getAllUsers, updateUser, addEvent, updateEvent, updateProductListing, getAllComments } = require('../controllers/adminController')
+const adminProtect = require('../middleware/adminMiddleware')
 
 
 const router = express.Router()
 
 
-router.get("/users", getAllUsers)
-router.put("/users/:uid", updateUser)
-router.post("/event", addEvent)
-router.put("/event/:eid", updateEvent)
-router.put("/product/:pid", updateProductListing)
-router.get("/comment/:eid", getAllComments)
+router.get("/users", adminProtect, getAllUsers)
+router.put("/users/:uid", adminProtect, updateUser)
+router.post("/event", adminProtect, addEvent)
+router.put("/event/:eid", adminProtect, updateEvent)
+router.put("/product/:pid", adminProtect, updateProductListing)
+router.get("/comment/:eid", adminProtect, getAllComments)
 
 
 

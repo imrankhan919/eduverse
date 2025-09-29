@@ -1,17 +1,70 @@
-const getAllUsers = (req, res) => {
-    res.send("Get All Users")
+const User = require("../models/userModel")
+const Event = require("../models/eventModel")
+
+const getAllUsers = async (req, res) => {
+    const users = await User.find()
+    if (!users) {
+        res.status(404)
+        throw new Error('Users Not Found!')
+    }
+    res.status(200).json(users)
 }
 
-const updateUser = (req, res) => {
-    res.send("Update User")
+const updateUser = async (req, res) => {
+
+    const updatedUser = await User.findByIdAndUpdate(req.params.uid, req.body, { new: true })
+
+    if (!updatedUser) {
+        res.status(400)
+        throw new Error('User Not Updated')
+    }
+
+    res.status(200).json(updatedUser)
+
 }
 
-const addEvent = (req, res) => {
-    res.send("Event Added")
+const addEvent = async (req, res) => {
+
+    const { eventName, eventDescription, eventImage, eventDate, status, location, availableSeats, organizer, price } = req.body
+
+    if (!eventName || !eventDescription || !eventImage || !eventDate || !status || !location || !availableSeats || !organizer || !price) {
+        res.status(400)
+        throw new Error("Please Fill Details")
+    }
+
+    let newEvent = await Event.create({
+        eventName,
+        eventDescription,
+        eventImage,
+        eventDate,
+        status,
+        location,
+        availableSeats,
+        organizer,
+        price
+    })
+
+    if (!newEvent) {
+        res.status(400)
+        throw new Error('Event Not Created')
+    }
+
+    res.status(201).json(newEvent)
+
+
+
 }
 
-const updateEvent = (req, res) => {
-    res.send("Event Updated")
+const updateEvent = async (req, res) => {
+    const updatedEvent = await Event.findByIdAndUpdate(req.params.eid, req.body, { new: true })
+
+    if (!updatedEvent) {
+        res.status(400)
+        throw new Error('Event Not Updated')
+    }
+
+    res.status(200).json(updatedEvent)
+
 }
 
 const updateProductListing = (req, res) => {
