@@ -1,5 +1,6 @@
 const User = require("../models/userModel")
 const Event = require("../models/eventModel")
+const Listing = require("../models/listingModel")
 
 const getAllUsers = async (req, res) => {
     const users = await User.find()
@@ -67,8 +68,16 @@ const updateEvent = async (req, res) => {
 
 }
 
-const updateProductListing = (req, res) => {
-    res.send("Listing Updated")
+const updateProductListing = async (req, res) => {
+    const updatedListing = await Listing.findByIdAndUpdate(req.params.pid, req.body, { new: true }).populate('user')
+
+    if (!updatedListing) {
+        res.status(404)
+        throw new Error('Product Not Updated!')
+    }
+
+
+    res.status(200).json(updatedListing)
 }
 
 const getAllComments = (req, res) => {
