@@ -1,6 +1,7 @@
 const User = require("../models/userModel")
 const Event = require("../models/eventModel")
 const Listing = require("../models/listingModel")
+const Comment = require('../models/commentModel')
 
 const getAllUsers = async (req, res) => {
     const users = await User.find()
@@ -80,8 +81,18 @@ const updateProductListing = async (req, res) => {
     res.status(200).json(updatedListing)
 }
 
-const getAllComments = (req, res) => {
-    res.send("All Comments")
+const getAllComments = async (req, res) => {
+
+    const comments = await Comment.find().populate('user').populate('event')
+    if (!comments) {
+        res.status(404)
+        throw new Error('Comments Not Found!')
+    }
+
+
+    res.status(200).json(comments)
+
+
 }
 
 
