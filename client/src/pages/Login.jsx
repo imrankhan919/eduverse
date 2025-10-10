@@ -1,22 +1,30 @@
 // UI Only — Login page with student/admin toggle
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import Loader from '../components/Loader';
+import { loginUser } from '../features/auth/authSlice';
 
 const Login = () => {
+
+  const { user, isLoading, isSuccess, isError, message } = useSelector(state => state.auth)
+
+
+
+
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (activeTab === 'admin') {
-      navigate('/admin');
-    } else {
-      alert(`Login successful! (UI Only)\nEmail: ${formData.email}\nType: ${activeTab}`);
-    }
+    dispatch(loginUser(formData))
   };
 
   const handleChange = (e) => {
@@ -25,6 +33,27 @@ const Login = () => {
       [e.target.name]: e.target.value
     });
   };
+
+
+  useEffect(() => {
+
+    if (user) {
+      navigate("/")
+    }
+
+
+    if (isError && message) {
+      toast.error(message, { position: "top-center" })
+    }
+  }, [isError, message, user])
+
+
+  if (isLoading) {
+    return (
+      <Loader />
+    )
+  }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-cyan-400 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

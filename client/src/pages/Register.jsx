@@ -1,9 +1,15 @@
 // UI Only — Login page with student/admin toggle
-
-import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux'
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify'
+import Loader from '../components/Loader';
+import { registerUser } from '../features/auth/authSlice';
 
 const Register = () => {
+
+    const { user, isLoading, isSuccess, isError, message } = useSelector(state => state.auth)
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -14,13 +20,14 @@ const Register = () => {
 
 
     const navigate = useNavigate();
+    const dispatch = useDispatch()
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (activeTab === 'admin') {
-            navigate('/admin');
+        if (formData.password !== formData.confirmPassword) {
+            toast.error("Passwords Not Match!", { position: "top-center" })
         } else {
-            alert(`Login successful! (UI Only)\nEmail: ${formData.email}\nType: ${activeTab}`);
+            dispatch(registerUser(formData))
         }
     };
 
@@ -30,6 +37,28 @@ const Register = () => {
             [e.target.name]: e.target.value
         });
     };
+
+
+    useEffect(() => {
+
+        if (user) {
+            navigate("/")
+        }
+
+
+        if (isError && message) {
+            toast.error(message, { position: "top-center" })
+        }
+    }, [isError, message, user])
+
+
+    if (isLoading) {
+        return (
+            <Loader />
+        )
+    }
+
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-cyan-400 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -60,7 +89,7 @@ const Register = () => {
                                 onChange={handleChange}
                                 required
                                 className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-shadow"
-                                placeholder="your.email@college.edu"
+                                placeholder="Jhon Wick"
                             />
                         </div>
                         <div>

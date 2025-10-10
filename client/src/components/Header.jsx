@@ -1,11 +1,25 @@
 // UI Only — Navigation header component
 
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { logoutUser } from '../features/auth/authSlice';
 
 const Header = () => {
+
+  const { user } = useSelector(state => state.auth)
+
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleLogout = () => {
+    dispatch(logoutUser())
+    navigate("/login")
+  }
+
 
   const navLinks = [
     { path: '/', label: 'Home' },
@@ -41,12 +55,26 @@ const Header = () => {
                 {link.label}
               </Link>
             ))}
-            <Link
-              to="/login"
-              className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-            >
-              Login
-            </Link>
+
+            {
+              user ? (<>
+                <Link to={"/myprofile"}
+                  className="px-6 py-2 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                >
+                  Welcome {user.name} !
+                </Link>
+                <button onClick={() => handleLogout()}
+                  className="px-6 py-2 bg-gradient-to-r from-red-600 to-pink-500 text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                >
+                  Logout
+                </button>
+              </>) : (<Link
+                to="/login"
+                className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              >
+                Login
+              </Link>)
+            }
           </div>
 
           <button
@@ -87,13 +115,25 @@ const Header = () => {
                 {link.label}
               </Link>
             ))}
-            <Link
-              to="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block mt-4 mx-4 py-2 text-center bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-full font-medium"
-            >
-              Login
-            </Link>
+            {
+              user ? (<>
+                <Link to={"/myprofile"}
+                  className="px-6 py-2 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                >
+                  Welcome {user.name} !
+                </Link>
+                <button onClick={() => handleLogout()}
+                  className="px-6 py-2 bg-gradient-to-r from-red-600 to-pink-500 text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                >
+                  Logout
+                </button>
+              </>) : (<Link
+                to="/login"
+                className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              >
+                Login
+              </Link>)
+            }
           </div>
         )}
       </nav>
