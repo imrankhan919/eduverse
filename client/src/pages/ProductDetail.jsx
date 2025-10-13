@@ -91,9 +91,8 @@ const ProductDetail = () => {
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                      currentImageIndex === index ? 'border-purple-600' : 'border-transparent'
-                    }`}
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 ${currentImageIndex === index ? 'border-purple-600' : 'border-transparent'
+                      }`}
                   >
                     <img src={image} alt={`${product.title} ${index + 1}`} className="w-full h-full object-cover" />
                   </button>
@@ -122,13 +121,12 @@ const ProductDetail = () => {
                 <p className="text-5xl font-black bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent mb-2">
                   {formatPrice(product.price)}
                 </p>
-                <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${
-                  product.condition === 'Like New'
+                <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${product.condition === 'Like New'
                     ? 'bg-green-100 text-green-700'
                     : product.condition === 'Good'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'bg-yellow-100 text-yellow-700'
-                }`}>
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'bg-yellow-100 text-yellow-700'
+                  }`}>
                   Condition: {product.condition}
                 </span>
               </div>

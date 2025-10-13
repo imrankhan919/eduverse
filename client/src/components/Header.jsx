@@ -23,8 +23,8 @@ const Header = () => {
 
   const navLinks = [
     { path: '/', label: 'Home' },
-    { path: '/marketplace', label: 'Marketplace' },
-    { path: '/events', label: 'Events' },
+    { path: '/auth/marketplace', label: 'Marketplace' },
+    { path: '/auth/events', label: 'Events' },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -58,7 +58,7 @@ const Header = () => {
 
             {
               user ? (<>
-                <Link to={"/myprofile"}
+                <Link to={user.isAdmin ? "/auth/admin" : "/auth/myprofile"}
                   className="px-6 py-2 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
                 >
                   Welcome {user.name} !

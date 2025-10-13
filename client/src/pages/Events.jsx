@@ -37,11 +37,10 @@ const Events = () => {
           {[1, 2].map((page) => (
             <button
               key={page}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                page === 1
+              className={`px-4 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 ${page === 1
                   ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white'
                   : 'border border-slate-300 text-slate-700 hover:bg-slate-100'
-              }`}
+                }`}
             >
               {page}
             </button>

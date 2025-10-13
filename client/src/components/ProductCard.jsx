@@ -9,7 +9,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group">
-      <Link to={`/product/${product.id}`} className="block relative">
+      <Link to={`/marketplace/${product.id}`} className="block relative">
         <div className="aspect-w-4 aspect-h-3 bg-slate-100 overflow-hidden">
           <img
             src={product.image}
@@ -65,13 +65,12 @@ const ProductCard = ({ product }) => {
             <p className="text-xs text-slate-500 mt-1">{product.seller.name}</p>
           </div>
           <div>
-            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-              product.condition === 'Like New'
+            <span className={`px-2 py-1 text-xs font-medium rounded-full ${product.condition === 'Like New'
                 ? 'bg-green-100 text-green-700'
                 : product.condition === 'Good'
-                ? 'bg-blue-100 text-blue-700'
-                : 'bg-yellow-100 text-yellow-700'
-            }`}>
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'bg-yellow-100 text-yellow-700'
+              }`}>
               {product.condition}
             </span>
           </div>
