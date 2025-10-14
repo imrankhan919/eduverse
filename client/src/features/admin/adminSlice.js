@@ -67,6 +67,40 @@ const adminSlice = createSlice({
                 state.adminError = true
                 state.adminErrorMessage = action.payload
             })
+            .addCase(updateListing.pending, (state, action) => {
+                state.adminLoading = true
+                state.adminSuccess = false
+                state.adminError = false
+            })
+            .addCase(updateListing.fulfilled, (state, action) => {
+                state.adminLoading = false
+                state.adminSuccess = true
+                state.allListings = state.allListings.map(item => item._id === action.payload._id ? action.payload : item)
+                state.adminError = false
+            })
+            .addCase(updateListing.rejected, (state, action) => {
+                state.adminLoading = false
+                state.adminSuccess = false
+                state.adminError = true
+                state.adminErrorMessage = action.payload
+            })
+            .addCase(updateUser.pending, (state, action) => {
+                state.adminLoading = true
+                state.adminSuccess = false
+                state.adminError = false
+            })
+            .addCase(updateUser.fulfilled, (state, action) => {
+                state.adminLoading = false
+                state.adminSuccess = true
+                state.allUsers = state.allUsers.map(item => item._id === action.payload._id ? action.payload : item)
+                state.adminError = false
+            })
+            .addCase(updateUser.rejected, (state, action) => {
+                state.adminLoading = false
+                state.adminSuccess = false
+                state.adminError = true
+                state.adminErrorMessage = action.payload
+            })
     }
 })
 
@@ -102,6 +136,28 @@ export const getAllEvents = createAsyncThunk("FETCH/EVENTS/ADMIN", async (_, thu
 export const getAllListings = createAsyncThunk("FETCH/LISTINGS/ADMIN", async (_, thunkAPI) => {
     try {
         return await adminService.fetchAllListings()
+    } catch (error) {
+        const message = error.response.data.message
+        return thunkAPI.rejectWithValue(message)
+    }
+})
+
+// UPDATE LISTING : (ADMIN)
+export const updateListing = createAsyncThunk("UPDATE/LISTING/ADMIN", async (updatedProduct, thunkAPI) => {
+    let token = thunkAPI.getState().auth.user.token
+    try {
+        return await adminService.updateListing(updatedProduct, token)
+    } catch (error) {
+        const message = error.response.data.message
+        return thunkAPI.rejectWithValue(message)
+    }
+})
+
+// UPDATE USER : (ADMIN)
+export const updateUser = createAsyncThunk("UPDATE/USER/ADMIN", async (updatedUser, thunkAPI) => {
+    let token = thunkAPI.getState().auth.user.token
+    try {
+        return await adminService.updateUser(updatedUser, token)
     } catch (error) {
         const message = error.response.data.message
         return thunkAPI.rejectWithValue(message)
