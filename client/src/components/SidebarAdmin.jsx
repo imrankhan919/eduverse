@@ -34,6 +34,15 @@ const SidebarAdmin = ({ activeTab, setActiveTab }) => {
       )
     },
     {
+      id: 'add',
+      label: 'Add Event',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      )
+    },
+    {
       id: 'users',
       label: 'Users',
       icon: (
@@ -57,9 +66,8 @@ const SidebarAdmin = ({ activeTab, setActiveTab }) => {
       </button>
 
       <aside
-        className={`fixed lg:sticky top-16 left-0 h-screen bg-white border-r border-slate-200 w-64 transition-transform duration-300 z-40 ${
-          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
+        className={`fixed lg:sticky top-16 left-0 h-screen bg-white border-r border-slate-200 w-64 transition-transform duration-300 z-40 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          }`}
       >
         <div className="p-6">
           <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent mb-6">
@@ -74,11 +82,10 @@ const SidebarAdmin = ({ activeTab, setActiveTab }) => {
                   setActiveTab(item.id);
                   setMobileMenuOpen(false);
                 }}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 ${
-                  activeTab === item.id
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 ${activeTab === item.id
                     ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-md'
                     : 'text-slate-600 hover:bg-slate-100'
-                }`}
+                  }`}
               >
                 {item.icon}
                 <span>{item.label}</span>

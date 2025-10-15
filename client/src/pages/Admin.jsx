@@ -4,13 +4,12 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import SidebarAdmin from '../components/SidebarAdmin';
 import StatsCard from '../components/StatsCard';
-import { mockProducts } from '../data/mockProducts';
-import { mockEvents } from '../data/mockEvents';
 import { formatPrice, formatDate } from '../utils/format';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllEvents, getAllListings, getAllUsers, updateListing, updateUser } from '../features/admin/adminSlice';
 import { toast } from 'react-toastify';
 import Loader from '../components/Loader';
+import AddEvent from '../components/AddEvent';
 
 const Admin = () => {
 
@@ -22,6 +21,23 @@ const Admin = () => {
 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [editModal, setEditModal] = useState(null);
+
+
+  const [formData, setFormData] = useState({
+    eventName: "",
+    eventDescription: "",
+    eventDate: "",
+    eventImage: "",
+    status: "",
+    location: "",
+    availableSeats: "",
+    organizer: "",
+    price: ""
+  })
+
+
+
+
 
   useEffect(() => {
     if (!user.isAdmin) {
@@ -190,9 +206,7 @@ const Admin = () => {
           <h1 className="text-3xl font-black text-slate-900 mb-2">Manage Events</h1>
           <p className="text-slate-600">View and manage all campus events</p>
         </div>
-        <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-xl font-medium hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-          + Add Event
-        </button>
+
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -233,6 +247,10 @@ const Admin = () => {
       </div>
     </div>
   );
+
+  <AddEvent />
+
+
 
   const UsersView = () => (
     <div className="space-y-6">
@@ -275,6 +293,7 @@ const Admin = () => {
         {activeTab === 'products' && <ProductsView />}
         {activeTab === 'events' && <EventsView />}
         {activeTab === 'users' && <UsersView />}
+        {activeTab === 'add' && <AddEvent />}
       </div>
 
       {editModal && (
