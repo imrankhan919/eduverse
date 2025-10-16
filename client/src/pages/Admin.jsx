@@ -6,7 +6,7 @@ import SidebarAdmin from '../components/SidebarAdmin';
 import StatsCard from '../components/StatsCard';
 import { formatPrice, formatDate } from '../utils/format';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllEvents, getAllListings, getAllUsers, updateListing, updateUser } from '../features/admin/adminSlice';
+import { editEvent, getAllEvents, getAllListings, getAllUsers, updateListing, updateUser } from '../features/admin/adminSlice';
 import { toast } from 'react-toastify';
 import Loader from '../components/Loader';
 import AddEvent from '../components/AddEvent';
@@ -22,25 +22,16 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [editModal, setEditModal] = useState(null);
 
-
-  const [formData, setFormData] = useState({
-    eventName: "",
-    eventDescription: "",
-    eventDate: "",
-    eventImage: "",
-    status: "",
-    location: "",
-    availableSeats: "",
-    organizer: "",
-    price: ""
-  })
-
-
+  // Edit Event
+  const handleEditEvent = (event) => {
+    dispatch(editEvent(event))
+    setActiveTab('add')
+  }
 
 
 
   useEffect(() => {
-    if (!user.isAdmin) {
+    if (!user?.isAdmin) {
       navigate("/myprofile")
     }
 
@@ -225,7 +216,7 @@ const Admin = () => {
                 </div>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => setEditModal({ type: 'event', item: event })}
+                    onClick={() => handleEditEvent(event)}
                     className="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     Edit
@@ -236,16 +227,14 @@ const Admin = () => {
                   >
                     View
                   </Link>
-                  <button className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-500">
-                    Delete
-                  </button>
+
                 </div>
               </div>
             </div>
           </div>
         ))}
       </div>
-    </div>
+    </div >
   );
 
   <AddEvent />

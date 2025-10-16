@@ -1,7 +1,14 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { addEvent, updateEvent } from '../features/admin/adminSlice'
 
 const AddEvent = () => {
 
+    const { edit } = useSelector(state => state.admin)
+
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const [formData, setFormData] = useState({
         eventName: "",
@@ -30,8 +37,14 @@ const AddEvent = () => {
 
     const handleAddEvent = (e) => {
         e.preventDefault()
-        console.log(formData)
+        !edit.isEdit ? dispatch(addEvent(formData)) : dispatch(updateEvent(formData))
+        navigate("/auth/events")
     }
+
+
+    useEffect(() => {
+        setFormData(edit.event)
+    }, [edit])
 
 
     return (
@@ -57,7 +70,7 @@ const AddEvent = () => {
                 <input name='organizer' value={organizer} onChange={handleChange} className='border border-gray-300 rounded-md p-1.5 w-full my-2' type="text" placeholder='Enter Event Organizer' />
                 <input name='price' value={price} onChange={handleChange} className='border border-gray-300 rounded-md p-1.5 w-full my-2' type="number" placeholder='Enter Event Ticket Price' />
                 <button type='submit' className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-xl font-medium hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                    + Add Event
+                    {edit.isEdit ? "Update Event" : "+ Add Event"}
                 </button>
             </form>
 

@@ -8,12 +8,26 @@ const adminSlice = createSlice({
         allEvents: [],
         allListings: [],
         allComments: [],
+        edit: {
+            event: {},
+            isEdit: false
+        },
         adminLoading: false,
         adminSuccess: false,
         adminError: false,
         adminErrorMessage: ""
     },
-    reducers: {},
+    reducers: {
+        editEvent: (state, action) => {
+            return {
+                ...state,
+                edit: {
+                    event: action.payload,
+                    isEdit: true
+                }
+            }
+        }
+    },
     extraReducers: builder => {
         builder
             .addCase(getAllUsers.pending, (state, action) => {
@@ -101,9 +115,45 @@ const adminSlice = createSlice({
                 state.adminError = true
                 state.adminErrorMessage = action.payload
             })
+            .addCase(addEvent.pending, (state, action) => {
+                state.adminLoading = true
+                state.adminSuccess = false
+                state.adminError = false
+            })
+            .addCase(addEvent.fulfilled, (state, action) => {
+                state.adminLoading = false
+                state.adminSuccess = true
+                state.allEvents = [action.payload, ...state.allEvents]
+                state.adminError = false
+            })
+            .addCase(addEvent.rejected, (state, action) => {
+                state.adminLoading = false
+                state.adminSuccess = false
+                state.adminError = true
+                state.adminErrorMessage = action.payload
+            })
+            .addCase(updateEvent.pending, (state, action) => {
+                state.adminLoading = true
+                state.adminSuccess = false
+                state.adminError = false
+            })
+            .addCase(updateEvent.fulfilled, (state, action) => {
+                state.adminLoading = false
+                state.adminSuccess = true
+                state.allEvents = state.allEvents.map(event => event._id === action.payload._id ? action.payload : event)
+                state.edit = { event: {}, isEdit: false }
+                state.adminError = false
+            })
+            .addCase(updateEvent.rejected, (state, action) => {
+                state.adminLoading = false
+                state.adminSuccess = false
+                state.adminError = true
+                state.adminErrorMessage = action.payload
+            })
     }
 })
 
+export const { editEvent } = adminSlice.actions
 
 export default adminSlice.reducer
 
@@ -163,3 +213,31 @@ export const updateUser = createAsyncThunk("UPDATE/USER/ADMIN", async (updatedUs
         return thunkAPI.rejectWithValue(message)
     }
 })
+
+
+// Add Event (ADMIN)  :
+
+export const addEvent = createAsyncThunk("ADD/EVENT/ADMIN", async (formData, thunkAPI) => {
+    let token = thunkAPI.getState().auth.user.token
+    try {
+        return adminService.createEvent(formData, token)
+    } catch (error) {
+        const message = error.response.data.message
+        return thunkAPI.rejectWithValue(message)
+    }
+})
+
+
+// Update Event (ADMIN)  :
+
+export const updateEvent = createAsyncThunk("UPDATE/EVENT/ADMIN", async (updatedEvent, thunkAPI) => {
+    let token = thunkAPI.getState().auth.user.token
+    try {
+        return adminService.update(updatedEvent, token)
+    } catch (error) {
+        const message = error.response.data.message
+        return thunkAPI.rejectWithValue(message)
+    }
+})
+
+
