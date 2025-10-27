@@ -1,11 +1,20 @@
 // UI Only — Marketplace page
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ProductCard from '../components/ProductCard';
 import FilterPanel from '../components/FilterPanel';
 import { mockProducts } from '../data/mockProducts';
+import { useDispatch, useSelector } from 'react-redux';
+import { getProducts } from '../features/products/productSlice';
+import { toast } from 'react-toastify';
+import Loader from '../components/Loader';
 
 const Marketplace = () => {
+
+  const { allProducts, productLoading, productError, productSuccess, productErrorMessage } = useSelector(state => state.products)
+
+  const dispatch = useDispatch()
+
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     category: 'All',
@@ -15,7 +24,7 @@ const Marketplace = () => {
     search: ''
   });
 
-  const filteredProducts = mockProducts.filter((product) => {
+  const filteredProducts = allProducts.filter((product) => {
     if (filters.category !== 'All' && product.category !== filters.category) {
       return false;
     }
@@ -47,6 +56,23 @@ const Marketplace = () => {
         return 0;
     }
   });
+
+
+  useEffect(() => {
+    dispatch(getProducts())
+
+    if (productError && productErrorMessage) {
+      toast.error(productErrorMessage)
+    }
+
+  }, [productError, productErrorMessage])
+
+  if (productLoading) {
+    return (
+      <Loader />
+    )
+  }
+
 
   return (
     <div className="min-h-screen bg-slate-50 py-8">
@@ -114,8 +140,8 @@ const Marketplace = () => {
                     <button
                       key={page}
                       className={`px-4 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 ${page === 1
-                          ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white'
-                          : 'border border-slate-300 text-slate-700 hover:bg-slate-100'
+                        ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white'
+                        : 'border border-slate-300 text-slate-700 hover:bg-slate-100'
                         }`}
                     >
                       {page}

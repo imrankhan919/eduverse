@@ -1,0 +1,75 @@
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import productService from "./productService";
+
+const productSlice = createSlice({
+    name: "products",
+    initialState: {
+        allProducts: [],
+        product: {},
+        productLoading: false,
+        productSuccess: false,
+        productError: false,
+        productErrorMessage: ""
+    },
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
+            .addCase(getProducts.pending, (state, action) => {
+                state.productLoading = true
+                state.productSuccess = false
+                state.productError = false
+            })
+            .addCase(getProducts.fulfilled, (state, action) => {
+                state.productLoading = false
+                state.allProducts = action.payload
+                state.productSuccess = true
+                state.productError = false
+            })
+            .addCase(getProducts.rejected, (state, action) => {
+                state.productLoading = false
+                state.productSuccess = false
+                state.productError = true
+                state.productErrorMessage = action.payload
+            })
+            .addCase(getProduct.pending, (state, action) => {
+                state.productLoading = true
+                state.productSuccess = false
+                state.productError = false
+            })
+            .addCase(getProduct.fulfilled, (state, action) => {
+                state.productLoading = false
+                state.product = action.payload
+                state.productSuccess = true
+                state.productError = false
+            })
+            .addCase(getProduct.rejected, (state, action) => {
+                state.productLoading = false
+                state.productSuccess = false
+                state.productError = true
+                state.productErrorMessage = action.payload
+            })
+    }
+})
+
+export default productSlice.reducer
+
+
+// Fetch Products
+export const getProducts = createAsyncThunk("FETCH/PRODUCTS", async () => {
+    try {
+        return await productService.fetchProducts()
+    } catch (error) {
+        const message = error.response.data.message
+        return thunkAPI.rejectWithValue(message)
+    }
+})
+
+// Fetch Product
+export const getProduct = createAsyncThunk("FETCH/PRODUCT", async (id) => {
+    try {
+        return await productService.fetchProduct(id)
+    } catch (error) {
+        const message = error.response.data.message
+        return thunkAPI.rejectWithValue(message)
+    }
+})

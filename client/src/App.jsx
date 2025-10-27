@@ -19,11 +19,11 @@ const App = () => {
       <Routes>
         <Route path='*' element={<PageNotFound />} />
         <Route path='/' element={<Landing />} />
+        <Route path='marketplace/:pid' element={<ProductDetail />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
         <Route path='/auth' element={<PrivateComponent />}>
           <Route path='marketplace' element={<Marketplace />} />
-          <Route path='marketplace/:pid' element={<ProductDetail />} />
           <Route path='events' element={<Events />} />
           <Route path='myprofile' element={<MyProfile />} />
           <Route path='admin' element={<Admin />} />
