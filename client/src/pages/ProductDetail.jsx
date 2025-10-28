@@ -1,5 +1,3 @@
-// UI Only — Product detail page
-
 import { useParams, Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { formatDate } from '../utils/format';

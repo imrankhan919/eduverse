@@ -1,9 +1,36 @@
-// UI Only — Events listing page
-
+import { useEffect } from 'react';
 import EventCard from '../components/EventCard';
 import { mockEvents } from '../data/mockEvents';
+import { useDispatch, useSelector } from 'react-redux';
+import { getEvents } from '../features/events/eventsSlice';
+import Loader from '../components/Loader';
+import { toast } from 'react-toastify';
 
 const Events = () => {
+
+  const { allEvents, eventsLoading, eventsSuccess, eventsError, eventsErrorMessage } = useSelector(state => state.events)
+
+
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(getEvents())
+
+    if (eventsError && eventsErrorMessage) {
+      toast.error(eventsErrorMessage)
+    }
+
+  }, [eventsError, eventsErrorMessage])
+
+
+  if (eventsLoading) {
+    return (
+      <Loader />
+    )
+  }
+
+
   return (
     <div className="min-h-screen bg-slate-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,8 +52,8 @@ const Events = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockEvents.map((event) => (
-            <EventCard key={event.id} event={event} />
+          {allEvents.map((event) => (
+            <EventCard key={event._id} event={event} />
           ))}
         </div>
 
@@ -38,8 +65,8 @@ const Events = () => {
             <button
               key={page}
               className={`px-4 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 ${page === 1
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white'
-                  : 'border border-slate-300 text-slate-700 hover:bg-slate-100'
+                ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white'
+                : 'border border-slate-300 text-slate-700 hover:bg-slate-100'
                 }`}
             >
               {page}

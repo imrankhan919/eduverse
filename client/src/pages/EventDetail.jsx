@@ -1,26 +1,31 @@
-// UI Only — Event detail page
-
 import { useParams, Link } from 'react-router-dom';
-import { mockEvents } from '../data/mockEvents';
 import { formatDateTime } from '../utils/format';
 import CommentList from '../components/CommentList';
 import CommentForm from '../components/CommentForm';
+import Loader from '../components/Loader';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getEvent } from '../features/events/eventsSlice';
+import { getComments } from '../features/comments/commentsSlice';
 
 const EventDetail = () => {
-  const { id } = useParams();
-  const event = mockEvents.find((e) => e.id === parseInt(id));
+  const { event, eventsLoading, eventsSuccess, eventsError, eventsErrorMessage } = useSelector(state => state.events)
+  const { allComments, commentsLoading, commentsError, commentsErrorMessage, commentsSuccess } = useSelector(state => state.comments)
 
-  if (!event) {
+  const { eid } = useParams();
+  const dispatch = useDispatch()
+
+
+  useEffect(() => {
+    dispatch(getEvent(eid))
+    dispatch(getComments(eid))
+  }, [eid])
+
+
+  if (eventsLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Event not found</h2>
-          <Link to="/events" className="text-purple-600 hover:underline">
-            Back to Events
-          </Link>
-        </div>
-      </div>
-    );
+      <Loader />
+    )
   }
 
   return (
@@ -44,14 +49,14 @@ const EventDetail = () => {
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-8">
           <div className="relative">
             <img
-              src={event.thumbnail}
-              alt={event.title}
+              src={event.eventImage}
+              alt={event.eventName}
               className="w-full h-64 md:h-96 object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
               <h1 className="text-3xl md:text-5xl font-black text-white mb-2">
-                {event.title}
+                {event.eventName}
               </h1>
             </div>
           </div>
@@ -66,7 +71,7 @@ const EventDetail = () => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-slate-500">Date & Time</p>
-                  <p className="text-lg font-bold text-slate-900">{formatDateTime(event.date)}</p>
+                  <p className="text-lg font-bold text-slate-900">{formatDateTime(event.eventDate)}</p>
                 </div>
               </div>
 
@@ -99,7 +104,7 @@ const EventDetail = () => {
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-slate-900 mb-4">About This Event</h2>
               <p className="text-slate-700 leading-relaxed text-lg">
-                {event.description}
+                {event.eventDescription}
               </p>
             </div>
 
@@ -108,7 +113,7 @@ const EventDetail = () => {
                 <svg className="w-6 h-6 text-purple-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                 </svg>
-                <span className="text-lg font-bold text-slate-900">{event.attendeesCount} people interested</span>
+                <span className="text-lg font-bold text-slate-900">{event.availableSeats} people interested</span>
               </div>
               <button className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-xl font-bold hover:shadow-lg hover:scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                 I'm Interested
@@ -119,9 +124,9 @@ const EventDetail = () => {
 
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-slate-900 mb-6">
-            Comments ({event.comments.length})
+            Comments ({allComments.length})
           </h2>
-          <CommentList comments={event.comments} />
+          <CommentList comments={allComments} />
         </div>
 
         <CommentForm />

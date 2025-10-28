@@ -11,6 +11,7 @@ import MyProfile from './pages/MyProfile'
 import Admin from './pages/Admin'
 import PrivateComponent from './components/PrivateComponent'
 import PageNotFound from './pages/PageNotFound'
+import EventDetail from './pages/EventDetail'
 
 const App = () => {
   return (
@@ -19,12 +20,13 @@ const App = () => {
       <Routes>
         <Route path='*' element={<PageNotFound />} />
         <Route path='/' element={<Landing />} />
-        <Route path='marketplace/:pid' element={<ProductDetail />} />
+        <Route path='/marketplace' element={<Marketplace />} />
+        <Route path='/marketplace/:pid' element={<ProductDetail />} />
+        <Route path='/events' element={<Events />} />
+        <Route path='/event/:eid' element={<EventDetail />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
         <Route path='/auth' element={<PrivateComponent />}>
-          <Route path='marketplace' element={<Marketplace />} />
-          <Route path='events' element={<Events />} />
           <Route path='myprofile' element={<MyProfile />} />
           <Route path='admin' element={<Admin />} />
         </Route>
