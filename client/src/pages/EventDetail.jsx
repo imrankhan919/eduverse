@@ -3,10 +3,10 @@ import { formatDateTime } from '../utils/format';
 import CommentList from '../components/CommentList';
 import CommentForm from '../components/CommentForm';
 import Loader from '../components/Loader';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getEvent } from '../features/events/eventsSlice';
-import { getComments } from '../features/comments/commentsSlice';
+import { addComment, getComments } from '../features/comments/commentsSlice';
 
 const EventDetail = () => {
   const { event, eventsLoading, eventsSuccess, eventsError, eventsErrorMessage } = useSelector(state => state.events)
@@ -14,6 +14,8 @@ const EventDetail = () => {
 
   const { eid } = useParams();
   const dispatch = useDispatch()
+
+
 
 
   useEffect(() => {
@@ -113,7 +115,7 @@ const EventDetail = () => {
                 <svg className="w-6 h-6 text-purple-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                 </svg>
-                <span className="text-lg font-bold text-slate-900">{event.availableSeats} people interested</span>
+                <span className="text-lg font-bold text-slate-900">{event.availableSeats} Seats</span>
               </div>
               <button className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-xl font-bold hover:shadow-lg hover:scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                 I'm Interested
@@ -129,7 +131,7 @@ const EventDetail = () => {
           <CommentList comments={allComments} />
         </div>
 
-        <CommentForm />
+        <CommentForm eid={eid} />
       </div>
     </div>
   );

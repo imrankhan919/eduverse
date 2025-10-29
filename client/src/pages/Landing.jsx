@@ -4,9 +4,22 @@ import { Link } from 'react-router-dom';
 import { CircleShape, SquiggleShape, TriangleShape, StarShape } from '../assets/FloatingShape';
 import { mockProducts } from '../data/mockProducts';
 import { formatPrice } from '../utils/format';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { getProducts } from '../features/products/productSlice';
 
 const Landing = () => {
-  const featuredProducts = mockProducts.slice(0, 4);
+
+  const { allProducts, productsLoading, productsSuccess, productsError, productsErrorMessage } = useSelector(state => state.products)
+
+  const dispatch = useDispatch()
+
+  const featuredProducts = allProducts.slice(0, 4);
+
+  useEffect(() => {
+    dispatch(getProducts())
+  }, [])
+
 
   return (
     <div className="min-h-screen">
@@ -63,13 +76,13 @@ const Landing = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {featuredProducts.map((product) => (
               <Link
-                key={product.id}
-                to={`/product/${product.id}`}
+                key={product._id}
+                to={`/marketplace/${product._id}`}
                 className="bg-slate-50 rounded-2xl overflow-hidden hover:-translate-y-2 hover:shadow-xl transition-all duration-300 group"
               >
                 <div className="aspect-square bg-slate-200 overflow-hidden">
                   <img
-                    src={product.image}
+                    src={product.itemImage}
                     alt={product.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
