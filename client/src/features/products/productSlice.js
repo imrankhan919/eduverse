@@ -9,9 +9,20 @@ const productSlice = createSlice({
         productLoading: false,
         productSuccess: false,
         productError: false,
-        productErrorMessage: ""
+        productErrorMessage: "",
+        edit: {
+            product: {},
+            isEdit: false
+        }
     },
-    reducers: {},
+    reducers: {
+        editProduct: (state, action) => {
+            return {
+                ...state,
+                edit: { product: action.payload, isEdit: true }
+            }
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(getProducts.pending, (state, action) => {
@@ -48,9 +59,45 @@ const productSlice = createSlice({
                 state.productError = true
                 state.productErrorMessage = action.payload
             })
+            .addCase(updateProduct.pending, (state, action) => {
+                state.productLoading = true
+                state.productSuccess = false
+                state.productError = false
+            })
+            .addCase(updateProduct.fulfilled, (state, action) => {
+                state.productLoading = false
+                state.allProducts = state.allProducts.map(product => product._id === action.payload._id ? action.payload : product)
+                state.edit = { product: {}, isEdit: false }
+                state.productSuccess = true
+                state.productError = false
+            })
+            .addCase(updateProduct.rejected, (state, action) => {
+                state.productLoading = false
+                state.productSuccess = false
+                state.productError = true
+                state.productErrorMessage = action.payload
+            })
+            .addCase(addProduct.pending, (state, action) => {
+                state.productLoading = true
+                state.productSuccess = false
+                state.productError = false
+            })
+            .addCase(addProduct.fulfilled, (state, action) => {
+                state.productLoading = false
+                state.allProducts = [action.payload, ...state.allProducts]
+                state.productSuccess = true
+                state.productError = false
+            })
+            .addCase(addProduct.rejected, (state, action) => {
+                state.productLoading = false
+                state.productSuccess = false
+                state.productError = true
+                state.productErrorMessage = action.payload
+            })
     }
 })
 
+export const { editProduct } = productSlice.actions
 export default productSlice.reducer
 
 
@@ -68,6 +115,35 @@ export const getProducts = createAsyncThunk("FETCH/PRODUCTS", async () => {
 export const getProduct = createAsyncThunk("FETCH/PRODUCT", async (id) => {
     try {
         return await productService.fetchProduct(id)
+    } catch (error) {
+        const message = error.response.data.message
+        return thunkAPI.rejectWithValue(message)
+    }
+})
+
+
+// Update Product
+export const updateProduct = createAsyncThunk("UPDATE/PRODUCT", async (formData, thunkAPI) => {
+
+    let token = thunkAPI.getState().auth.user.token
+
+    try {
+        return await productService.update(formData, token)
+    } catch (error) {
+        const message = error.response.data.message
+        return thunkAPI.rejectWithValue(message)
+    }
+})
+
+// Add Product
+export const addProduct = createAsyncThunk("ADD/PRODUCT", async (formData, thunkAPI) => {
+
+    console.log(formData)
+
+    let token = thunkAPI.getState().auth.user.token
+
+    try {
+        return await productService.add(formData, token)
     } catch (error) {
         const message = error.response.data.message
         return thunkAPI.rejectWithValue(message)

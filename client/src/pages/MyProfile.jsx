@@ -1,10 +1,104 @@
 import { User, Package, MessageSquare, Mail, Phone, Send, Edit, Trash2, Eye } from 'lucide-react';
-import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Loader from '../components/Loader';
+import { addProduct, editProduct, getProducts, updateProduct } from '../features/products/productSlice';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const MyProfile = () => {
 
     const { user } = useSelector(state => state.auth)
 
+    const { edit, allProducts, productLoading, productError, productSuccess, productErrorMessage } = useSelector(state => state.products)
+
+
+
+
+
+    const [formData, setFormData] = useState({
+        title: "",
+        isAvailable: true,
+        price: "",
+        itemImage: "",
+        description: ""
+    })
+
+    const [myProducts, setMyProducts] = useState([])
+
+
+    const { title, isAvailable, price, itemImage, description } = formData
+
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        })
+    }
+
+
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        if (edit.isEdit) {
+            dispatch(updateProduct(formData))
+            if (productSuccess) {
+                toast.success("Product Updated", { position: "top-center" })
+            }
+        } else {
+            dispatch(addProduct(formData))
+            if (productSuccess) {
+                dispatch(getProducts())
+                toast.success("Product Added", { position: "top-center" })
+                navigate("/marketplace")
+            }
+        }
+
+
+
+        setFormData({
+            title: "",
+            isAvailable: true,
+            price: "",
+            itemImage: "",
+            description: ""
+        })
+
+    }
+
+
+
+
+    useEffect(() => {
+
+        if (allProducts.length === 0) {
+            dispatch(getProducts())
+        }
+
+        setMyProducts(allProducts.filter((product) => {
+            if (product.user.email === user.email) {
+                return product
+            }
+        }))
+
+
+        if (productError && productErrorMessage) {
+            toast.error(productErrorMessage)
+        }
+
+
+        setFormData(edit.product)
+
+
+    }, [productError, productErrorMessage, edit, productSuccess])
+
+    if (productLoading) {
+        return (
+            <Loader />
+        )
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-pink-500 via-purple-500 to-blue-400">
@@ -57,26 +151,25 @@ const MyProfile = () => {
                             </div>
                         </div>
                         <div className="p-8">
-                            <form className="space-y-6">
+                            <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">Title</label>
                                         <input
+                                            value={title}
+                                            name='title'
+                                            onChange={handleChange}
                                             type="text"
                                             placeholder="Enter listing title"
                                             className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-colors"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
-                                        <select className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-colors">
-                                            <option>Select category</option>
-                                            <option>Electronics</option>
-                                            <option>Books</option>
-                                            <option>Furniture</option>
-                                            <option>Clothing</option>
-                                            <option>Services</option>
-                                            <option>Other</option>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Availablity</label>
+                                        <select defaultValue={isAvailable} onChange={handleChange} name='isAvailable' className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-colors">
+                                            <option>Select</option>
+                                            <option value={true}>Available</option>
+                                            <option value={false}>Unavailable</option>
                                         </select>
                                     </div>
                                 </div>
@@ -86,19 +179,23 @@ const MyProfile = () => {
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">Price</label>
                                         <input
                                             type="number"
+                                            name='price'
+                                            value={price}
+                                            onChange={handleChange}
                                             placeholder="Enter price"
                                             className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-colors"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Condition</label>
-                                        <select className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-colors">
-                                            <option>Select condition</option>
-                                            <option>Brand New</option>
-                                            <option>Like New</option>
-                                            <option>Good</option>
-                                            <option>Fair</option>
-                                        </select>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Image URL</label>
+                                        <input
+                                            type="text"
+                                            name='itemImage'
+                                            value={itemImage}
+                                            onChange={handleChange}
+                                            placeholder="Enter Image Url"
+                                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-colors"
+                                        />
                                     </div>
                                 </div>
 
@@ -106,19 +203,14 @@ const MyProfile = () => {
                                     <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
                                     <textarea
                                         rows={4}
+                                        value={description}
+                                        name='description'
+                                        onChange={handleChange}
                                         placeholder="Describe your item or service"
                                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-colors resize-none"
                                     ></textarea>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Images</label>
-                                    <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-500 transition-colors cursor-pointer">
-                                        <Package className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                                        <p className="text-gray-600 font-medium">Click to upload images</p>
-                                        <p className="text-sm text-gray-500 mt-1">PNG, JPG up to 5MB</p>
-                                    </div>
-                                </div>
 
                                 <div className="flex justify-end">
                                     <button
@@ -140,94 +232,46 @@ const MyProfile = () => {
                                     <Package className="w-8 h-8 text-white" />
                                     <h2 className="text-3xl font-bold text-white">My Listings</h2>
                                 </div>
-                                <span className="bg-white text-purple-600 font-bold px-4 py-2 rounded-full">3 Active</span>
+                                <span className="bg-white text-purple-600 font-bold px-4 py-2 rounded-full">{myProducts.length} Listings</span>
                             </div>
                         </div>
                         <div className="p-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {/* Listing 1 */}
-                                <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl overflow-hidden border-2 border-transparent hover:border-pink-300 transition-all hover:shadow-lg">
-                                    <div className="h-48 bg-gradient-to-br from-pink-200 to-purple-200 flex items-center justify-center">
-                                        <Package className="w-16 h-16 text-purple-600" />
-                                    </div>
-                                    <div className="p-6">
-                                        <div className="flex items-start justify-between mb-2">
-                                            <h3 className="text-xl font-bold text-gray-900">MacBook Pro 2021</h3>
-                                            <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">Active</span>
-                                        </div>
-                                        <p className="text-gray-600 text-sm mb-3">Electronics • Like New</p>
-                                        <p className="text-2xl font-bold text-purple-600 mb-4">₹75,000</p>
-                                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-                                            <Eye className="w-4 h-4" />
-                                            <span>145 views</span>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <button className="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
-                                                <Edit className="w-4 h-4" />
-                                                Edit
-                                            </button>
-                                            <button className="bg-red-100 hover:bg-red-200 text-red-600 px-4 py-2 rounded-xl font-semibold transition-colors">
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                {/* Listings*/}
+                                {
+                                    myProducts.map((product) => {
+                                        return (
+                                            <div key={product._id} className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl overflow-hidden border-2 border-transparent hover:border-pink-300 transition-all hover:shadow-lg">
+                                                <div className="h-48 bg-white flex items-center justify-center">
+                                                    {/* <Package className="w-16 h-16 text-purple-600" /> */}
+                                                    <img className="h-44 text-purple-600" src={product.itemImage} alt="" />
+                                                </div>
+                                                <div className="p-6">
+                                                    <div className="flex items-start justify-between mb-2">
+                                                        <h3 className="text-xl font-bold text-gray-900">{product.title}</h3>
+                                                        <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">{product.isAvailable ? "Active" : "InActive"}</span>
+                                                    </div>
+                                                    <p className="text-gray-600 text-sm mb-3">Electronics • Like New</p>
+                                                    <p className="text-2xl font-bold text-purple-600 mb-4">₹{product.price}</p>
+                                                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+                                                        <Eye className="w-4 h-4" />
+                                                        <span>145 views</span>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <button onClick={() => dispatch(editProduct(product))} className="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
+                                                            <Edit className="w-4 h-4" />
+                                                            Edit
+                                                        </button>
+                                                        <button className="bg-red-100 hover:bg-red-200 text-red-600 px-4 py-2 rounded-xl font-semibold transition-colors">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )
+                                    })
+                                }
 
-                                {/* Listing 2 */}
-                                <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl overflow-hidden border-2 border-transparent hover:border-purple-300 transition-all hover:shadow-lg">
-                                    <div className="h-48 bg-gradient-to-br from-purple-200 to-blue-200 flex items-center justify-center">
-                                        <Package className="w-16 h-16 text-blue-600" />
-                                    </div>
-                                    <div className="p-6">
-                                        <div className="flex items-start justify-between mb-2">
-                                            <h3 className="text-xl font-bold text-gray-900">Study Table</h3>
-                                            <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">Active</span>
-                                        </div>
-                                        <p className="text-gray-600 text-sm mb-3">Furniture • Good</p>
-                                        <p className="text-2xl font-bold text-purple-600 mb-4">₹3,500</p>
-                                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-                                            <Eye className="w-4 h-4" />
-                                            <span>89 views</span>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <button className="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
-                                                <Edit className="w-4 h-4" />
-                                                Edit
-                                            </button>
-                                            <button className="bg-red-100 hover:bg-red-200 text-red-600 px-4 py-2 rounded-xl font-semibold transition-colors">
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Listing 3 */}
-                                <div className="bg-gradient-to-br from-blue-50 to-pink-50 rounded-2xl overflow-hidden border-2 border-transparent hover:border-blue-300 transition-all hover:shadow-lg">
-                                    <div className="h-48 bg-gradient-to-br from-blue-200 to-pink-200 flex items-center justify-center">
-                                        <Package className="w-16 h-16 text-pink-600" />
-                                    </div>
-                                    <div className="p-6">
-                                        <div className="flex items-start justify-between mb-2">
-                                            <h3 className="text-xl font-bold text-gray-900">Physics Textbook</h3>
-                                            <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">Active</span>
-                                        </div>
-                                        <p className="text-gray-600 text-sm mb-3">Books • Like New</p>
-                                        <p className="text-2xl font-bold text-purple-600 mb-4">₹450</p>
-                                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-                                            <Eye className="w-4 h-4" />
-                                            <span>67 views</span>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <button className="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
-                                                <Edit className="w-4 h-4" />
-                                                Edit
-                                            </button>
-                                            <button className="bg-red-100 hover:bg-red-200 text-red-600 px-4 py-2 rounded-xl font-semibold transition-colors">
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
