@@ -1,29 +1,26 @@
 const Message = require("../models/messageModel")
 const Listing = require("../models/listingModel")
-
-
 const getMessages = async (req, res) => {
+    try {
+        // Get all listing IDs created by the logged-in user
+        const myListingIds = await Listing.find({ user: req.user._id }).distinct("_id");
 
+        // Fetch only messages whose listing matches user's listings
+        const messages = await Message.find({
+            listing: { $in: myListingIds }
+        })
+            .populate("user")
+            .populate("listing");
 
-    const messages = await Message.find().populate('user').populate('listing')
-    const myListings = await Listing.find({ user: req.user._id })
+        if (!messages) {
+            return res.status(404).json({ message: "No messages found!" });
+        }
 
-    if (!messages) {
-        res.status(404)
-        throw new Error('Messages Not Found!')
+        res.status(200).json(messages);
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-
-    // Todo : Send Message Only Avaialable In My Listing
-    // let myMessages = []
-
-    // for (let i = 0; i < messages.length; i++) {
-    //     if (myListings.includes(messages[i].listing._id)) {
-    //         myMessages.push(messages[i])
-    //     }
-    // }
-
-
-    res.status(200).json(messages)
 }
 
 const sendMessage = async (req, res) => {
