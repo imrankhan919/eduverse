@@ -1,17 +1,18 @@
-import { User, Package, MessageSquare, Mail, Phone, Send, Edit, Trash2, Eye } from 'lucide-react';
+import { User, Package, MessageSquare, Mail, Phone, Send, Edit, Trash2, Eye, PhoneCall, MailIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../components/Loader';
 import { addProduct, editProduct, getProducts, updateProduct } from '../features/products/productSlice';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { getMessages } from '../features/messages/messageSlice';
 
 const MyProfile = () => {
 
     const { user } = useSelector(state => state.auth)
 
     const { edit, allProducts, productLoading, productError, productSuccess, productErrorMessage } = useSelector(state => state.products)
-
+    const { allMessages, messageSuccess, messageLoading, messageError, messageErrorMessage } = useSelector(state => state.message)
 
 
 
@@ -42,12 +43,14 @@ const MyProfile = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
+        // Add Product
         if (edit.isEdit) {
             dispatch(updateProduct(formData))
             if (productSuccess) {
                 toast.success("Product Updated", { position: "top-center" })
             }
         } else {
+            // Update Product
             dispatch(addProduct(formData))
             if (productSuccess) {
                 dispatch(getProducts())
@@ -73,6 +76,7 @@ const MyProfile = () => {
 
     useEffect(() => {
 
+        // Fetch Products
         if (allProducts.length === 0) {
             dispatch(getProducts())
         }
@@ -83,18 +87,20 @@ const MyProfile = () => {
             }
         }))
 
+        // Fetch Messages
+        dispatch(getMessages())
 
-        if (productError && productErrorMessage) {
-            toast.error(productErrorMessage)
+        if (productError && productErrorMessage || messageError && messageErrorMessage) {
+            toast.error(productErrorMessage || messageErrorMessage)
         }
 
 
         setFormData(edit.product)
 
 
-    }, [productError, productErrorMessage, edit, productSuccess])
+    }, [productError, productErrorMessage, edit, productSuccess, messageError, messageErrorMessage])
 
-    if (productLoading) {
+    if (productLoading || messageLoading) {
         return (
             <Loader />
         )
@@ -286,66 +292,39 @@ const MyProfile = () => {
                         </div>
                         <div className="p-8">
                             <div className="space-y-4">
-                                {/* Message 1 */}
-                                <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6 hover:shadow-lg transition-shadow cursor-pointer border-2 border-transparent hover:border-purple-300">
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
-                                                <User className="w-6 h-6 text-white" />
+                                {/* All Messages */}
+                                {
+                                    allMessages.map(message => {
+                                        return (
+                                            <div key={message._id} className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6 hover:shadow-lg transition-shadow cursor-pointer border-2 border-transparent hover:border-purple-300">
+                                                <div className="flex items-start justify-between mb-3">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
+                                                            <User className="w-6 h-6 text-white" />
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="font-bold text-gray-900 text-lg">{message.user.name}</h3>
+                                                            <p className="text-sm text-gray-600">{new Date(message.createdAt).toLocaleDateString('en-IN')}</p>
+                                                        </div>
+                                                    </div>
+                                                    <span className="bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full">{message.listing.title}</span>
+                                                </div>
+                                                <p className="text-gray-700 mb-3">{message.text}</p>
+                                                <a className="text-purple-600 font-semibold hover:text-purple-700 flex items-center gap-2">
+                                                    <PhoneCall className="w-4 h-4" />
+                                                    {message.user.phone}
+                                                </a>
+                                                <a className="text-purple-600 font-semibold hover:text-purple-700 flex items-center gap-2">
+                                                    <MailIcon className="w-4 h-4" />
+                                                    {message.user.email}
+                                                </a>
                                             </div>
-                                            <div>
-                                                <h3 className="font-bold text-gray-900 text-lg">Rahul Sharma</h3>
-                                                <p className="text-sm text-gray-600">2 hours ago</p>
-                                            </div>
-                                        </div>
-                                        <span className="bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full">New</span>
-                                    </div>
-                                    <p className="text-gray-700 mb-3">Hi! Is the laptop still available? I'm interested in buying it.</p>
-                                    <button className="text-purple-600 font-semibold hover:text-purple-700 flex items-center gap-2">
-                                        <Send className="w-4 h-4" />
-                                        Reply
-                                    </button>
-                                </div>
+                                        )
+                                    })
+                                }
 
-                                {/* Message 2 */}
-                                <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 hover:shadow-lg transition-shadow cursor-pointer border-2 border-transparent hover:border-purple-300">
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
-                                                <User className="w-6 h-6 text-white" />
-                                            </div>
-                                            <div>
-                                                <h3 className="font-bold text-gray-900 text-lg">Priya Verma</h3>
-                                                <p className="text-sm text-gray-600">5 hours ago</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p className="text-gray-700 mb-3">Thanks for the quick response! When can we meet?</p>
-                                    <button className="text-purple-600 font-semibold hover:text-purple-700 flex items-center gap-2">
-                                        <Send className="w-4 h-4" />
-                                        Reply
-                                    </button>
-                                </div>
 
-                                {/* Message 3 */}
-                                <div className="bg-gradient-to-br from-blue-50 to-pink-50 rounded-2xl p-6 hover:shadow-lg transition-shadow cursor-pointer border-2 border-transparent hover:border-purple-300">
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-pink-600 rounded-full flex items-center justify-center">
-                                                <User className="w-6 h-6 text-white" />
-                                            </div>
-                                            <div>
-                                                <h3 className="font-bold text-gray-900 text-lg">Amit Patel</h3>
-                                                <p className="text-sm text-gray-600">1 day ago</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p className="text-gray-700 mb-3">Can you send more pictures of the book?</p>
-                                    <button className="text-purple-600 font-semibold hover:text-purple-700 flex items-center gap-2">
-                                        <Send className="w-4 h-4" />
-                                        Reply
-                                    </button>
-                                </div>
+
                             </div>
                         </div>
                     </div>

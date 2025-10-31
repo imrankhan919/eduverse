@@ -1,32 +1,41 @@
 import { useParams, Link } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { formatDate } from '../utils/format';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProduct } from '../features/products/productSlice';
 import Loader from '../components/Loader';
 import { toast } from 'react-toastify';
+import { addMessage } from '../features/messages/messageSlice';
 
 const ProductDetail = () => {
 
   const { product, productLoading, productSuccess, productError, productErrorMessage } = useSelector(state => state.products)
-
+  const { messageLoading, messageSuccess, messageError, messageErrorMessage } = useSelector(state => state.message)
 
   const { pid } = useParams();
   const dispatch = useDispatch()
 
+  const [sent, setSent] = useState(false)
+
+  // Send Message
+  const sendAlert = (pid) => {
+    dispatch(addMessage(pid))
+    setSent(true)
+    toast.success("Message Sent!")
+  }
 
 
   useEffect(() => {
     dispatch(getProduct(pid))
 
-    if (productError && productErrorMessage) {
-      toast.error(productErrorMessage)
+    if (productError && productErrorMessage || messageError || messageErrorMessage) {
+      toast.error(productErrorMessage || messageErrorMessage)
     }
 
 
-  }, [pid, productError, productErrorMessage])
+  }, [pid, productError, productErrorMessage, messageError, messageErrorMessage])
 
-  if (productLoading) {
+  if (productLoading || messageLoading) {
     return (
       <Loader />
     )
@@ -115,8 +124,8 @@ const ProductDetail = () => {
               </div>
 
               <div className="flex gap-3">
-                <button className="flex-1 py-4 px-6 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-xl font-bold hover:shadow-lg hover:scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                  Contact Seller
+                <button disabled={sent} onClick={() => sendAlert(product._id)} className={sent ? "flex-1 py-4 px-6 text-white rounded-xl font-bold hover:shadow-lg hover:scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:bg-green-500" : "flex-1 py-4 px-6 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-xl font-bold hover:shadow-lg hover:scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"}>
+                  {sent ? "Seller Contacted" : " Contact Seller"}
                 </button>
                 <button className="py-4 px-6 border-2 border-slate-300 text-slate-700 rounded-xl font-bold hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
